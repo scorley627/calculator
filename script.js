@@ -1,35 +1,68 @@
 const NUMBER_CHARS = "1234567890";
+const PLUS_SIGN = "+";
+const MINUS_SIGN = "\u2212";
+const TIMES_SIGN = "\u00D7";
+const DIVIDE_SIGN = "\u00f7";
+const OPERATOR_CHARS = PLUS_SIGN + MINUS_SIGN + TIMES_SIGN + DIVIDE_SIGN;
 
 let operator;
 let operand1;
 let operand2;
 
+let currentNumber = "0";
+let operatorButton;
+
 document.addEventListener("click", handleClick);
 
 function handleClick(event) {
   if (event.target.className.includes("button")) {
-    handleButtonClick(event.target.textContent, event.target.className);
+    handleButtonClick(event.target);
   }
 }
 
-function handleButtonClick(buttonText, buttonClass) {
-  const isNumberButton = NUMBER_CHARS.includes(buttonText);
-  const isDecimalButton = buttonText == ".";
-  const isSignButton = buttonClass.includes("sign");
+function handleButtonClick(button) {
+  const isNumberButton = NUMBER_CHARS.includes(button.textContent);
+  const isOperatorButton = OPERATOR_CHARS.includes(button.textContent);
+  const isSignButton = button.className.includes("sign");
+  const isEqualsButton = button.className.includes("equals");
+  const isDecimalButton = button.textContent == ".";
 
   if (isNumberButton) {
-    addDigit(buttonText);
+    addDigit(button.textContent);
   } else if (isDecimalButton) {
     addDecimal();
   } else if (isSignButton) {
     changeSign();
+  } else if (isOperatorButton) {
+    handleOperator(button);
+  } else if (isEqualsButton) {
+    calculateResult();
   }
 }
 
+function handleOperator(button) {
+  operatorButton = button;
+  operatorButton.classList.add("button--highlight");
+
+  operator = operatorButton.textContent;
+  operand1 = parseFloat(currentNumber);
+  currentNumber = "0";
+}
+
+function calculateResult() {
+  operatorButton.classList.remove("button--highlight");
+  operatorButton = null;
+
+  operand2 = parseFloat(currentNumber);
+  result = operate(operator, operand1, operand2);
+
+  updateDisplay(result);
+  currentNumber = "0";
+}
+
 function addDigit(digit) {
-  const display = document.querySelector(".calculator__display");
-  const isFull = display.textContent.length == 9;
-  const isZero = display.textContent == "0";
+  const isFull = currentNumber.length == 9;
+  const isZero = currentNumber == "0";
   const bothZero = isZero && digit == "0";
 
   if (isFull || bothZero) {
@@ -37,52 +70,57 @@ function addDigit(digit) {
   }
 
   if (isZero) {
-    display.textContent = digit;
+    currentNumber = digit;
   } else {
-    display.textContent += digit;
+    currentNumber += digit;
   }
 
-  operand1 = parseFloat(display.textContent);
+  updateDisplay(currentNumber);
 }
 
 function addDecimal() {
-  const display = document.querySelector(".calculator__display");
-  const isFull = display.textContent.length == 9;
-  const hasDecimal = display.textContent.includes(".");
-
+  const isFull = currentNumber.length == 9;
+  const hasDecimal = currentNumber.includes(".");
+  
   if (isFull || hasDecimal) {
     return;
   }
 
-  display.textContent += ".";
+  currentNumber += ".";
+
+  updateDisplay(currentNumber);
 }
 
 function changeSign() {
-  const display = document.querySelector(".calculator__display");
-  const isFull = display.textContent.length == 9;
-  const isZero = display.textContent == "0";
-  const isNegative = !isZero && display.textContent.includes("-");
+  const isFull = currentNumber.length == 9;
+  const isZero = currentNumber == "0";
+  const isNegative = !isZero && currentNumber.includes("-");
   const isFullPositive = isFull && !isNegative;
-
+  
   if (isZero || isFullPositive) {
     return;
   }
-
-  if (isNegative) {
-    display.textContent = display.textContent.replace("-", "");
-  } else {
-    display.textContent = "-" + display.textContent;
-  }
   
-  operand1 = parseFloat(display.textContent);
+  if (isNegative) {
+    currentNumber = currentNumber.replace("-", "");
+  } else {
+    currentNumber = "-" + currentNumber;
+  }
+
+  updateDisplay(currentNumber);
+}
+
+function updateDisplay(text) {
+  const display = document.querySelector(".calculator__display");
+  display.textContent = text;
 }
 
 function operate(op, num1, num2) {
   switch(op) {
-    case "+": return add(num1, num2);
-    case "-": return subtract(num1, num2);
-    case "*": return multiply(num1, num2);
-    case "/": return divide(num1, num2);
+    case PLUS_SIGN: return add(num1, num2);
+    case MINUS_SIGN: return subtract(num1, num2);
+    case TIMES_SIGN: return multiply(num1, num2);
+    case DIVIDE_SIGN: return divide(num1, num2);
   }
 }
 

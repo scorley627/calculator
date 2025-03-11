@@ -48,6 +48,10 @@
   font-family: inherit;
 }
 
+.button--highlight {
+  background-color: rgb(0, 192, 250);
+}
+
 .button--sign {
   font-size: 40px;
 }
