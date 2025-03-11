@@ -7,20 +7,74 @@ let operand2;
 document.addEventListener("click", handleClick);
 
 function handleClick(event) {
-  const targetClass = event.target.className;
-  const targetText = event.target.textContent;
-  const isButton = targetClass.includes("button");
-  const isNumberButton = isButton && NUMBER_CHARS.includes(targetText);
-  if (isNumberButton) updateDisplay(targetText);
+  if (event.target.className.includes("button")) {
+    handleButtonClick(event.target.textContent, event.target.className);
+  }
 }
 
-function updateDisplay(text) {
-  const display = document.querySelector(".calculator__display");
-  const isDisplayFull = display.textContent.length == 9;
-  if (!isDisplayFull) {
-    display.textContent += text;
-    operand1 = parseFloat(display.textContent);
+function handleButtonClick(buttonText, buttonClass) {
+  const isNumberButton = NUMBER_CHARS.includes(buttonText);
+  const isDecimalButton = buttonText == ".";
+  const isSignButton = buttonClass.includes("sign");
+
+  if (isNumberButton) {
+    addDigit(buttonText);
+  } else if (isDecimalButton) {
+    addDecimal();
+  } else if (isSignButton) {
+    changeSign();
   }
+}
+
+function addDigit(digit) {
+  const display = document.querySelector(".calculator__display");
+  const isFull = display.textContent.length == 9;
+  const isZero = display.textContent == "0";
+  const bothZero = isZero && digit == "0";
+
+  if (isFull || bothZero) {
+    return;
+  }
+
+  if (isZero) {
+    display.textContent = digit;
+  } else {
+    display.textContent += digit;
+  }
+
+  operand1 = parseFloat(display.textContent);
+}
+
+function addDecimal() {
+  const display = document.querySelector(".calculator__display");
+  const isFull = display.textContent.length == 9;
+  const hasDecimal = display.textContent.includes(".");
+
+  if (isFull || hasDecimal) {
+    return;
+  }
+
+  display.textContent += ".";
+}
+
+function changeSign() {
+  const display = document.querySelector(".calculator__display");
+  const isFull = display.textContent.length == 9;
+  const isZero = display.textContent == "0";
+  const isNegative = !isZero && display.textContent.includes("-");
+  const isFullPositive = isFull && !isNegative;
+
+  if (isZero || isFullPositive) {
+    return;
+  }
+
+  if (isNegative) {
+    display.textContent = display.textContent.replace("-", "");
+  } else {
+    display.textContent = "-" + display.textContent;
+  }
+  
+  operand1 = parseFloat(display.textContent);
 }
 
 function operate(op, num1, num2) {
