@@ -1,6 +1,6 @@
 .calculator {
   background-color: silver;
-  width: 400px;
+  width: 385px;
   height: 523px;
   margin: 48px auto;
   display: flex;
@@ -39,16 +39,16 @@
 }
 
 .button {
-  width: 90px;
+  width: 86px;
   height: 75px;
-  font-size: 70px;
+  font-size: 65px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .button--sign {
-  font-size: 50px;
+  font-size: 45px;
 }
 
 .button--add {
