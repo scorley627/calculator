@@ -47,7 +47,11 @@
   align-items: center;
 }
 
-.button--plus {
+.button--sign {
+  font-size: 50px;
+}
+
+.button--add {
   flex: 1;
 }
 
