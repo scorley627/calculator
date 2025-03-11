@@ -9,7 +9,7 @@ let operator;
 let operand1;
 let operand2;
 
-let currentNumber = "0";
+let inputNumber = "0";
 let operatorButton;
 
 document.addEventListener("click", handleClick);
@@ -26,6 +26,7 @@ function handleButtonClick(button) {
   const isSignButton = button.className.includes("sign");
   const isEqualsButton = button.className.includes("equals");
   const isDecimalButton = button.textContent == ".";
+  const isClearButton = button.textContent == "C";
 
   if (isNumberButton) {
     addDigit(button.textContent);
@@ -37,32 +38,53 @@ function handleButtonClick(button) {
     handleOperator(button);
   } else if (isEqualsButton) {
     calculateResult();
+  } else if (isClearButton) {
+    clear();
   }
 }
 
 function handleOperator(button) {
+  if (operatorButton != null) {
+    calculateResult();
+  }
+
   operatorButton = button;
   operatorButton.classList.add("button--highlight");
 
+  const display = document.querySelector(".calculator__display");
   operator = operatorButton.textContent;
-  operand1 = parseFloat(currentNumber);
-  currentNumber = "0";
+  operand1 = parseFloat(display.textContent);
+  inputNumber = "0";
 }
 
 function calculateResult() {
   operatorButton.classList.remove("button--highlight");
   operatorButton = null;
 
-  operand2 = parseFloat(currentNumber);
+  const display = document.querySelector(".calculator__display");
+  operand2 = parseFloat(display.textContent);
   result = operate(operator, operand1, operand2);
 
-  updateDisplay(result);
-  currentNumber = "0";
+  display.textContent = result
+  inputNumber = "0";
+}
+
+function clear() {
+  operator = null;
+  operand1 = 0;
+  operand2 = 0;
+  inputNumber = "0"
+  if (operatorButton != null) {
+    operatorButton.classList.remove("button--highlight");
+    operatorButton = null;
+  }
+  const display = document.querySelector(".calculator__display");
+  display.textContent = "0";
 }
 
 function addDigit(digit) {
-  const isFull = currentNumber.length == 9;
-  const isZero = currentNumber == "0";
+  const isFull = inputNumber.length == 9;
+  const isZero = inputNumber == "0";
   const bothZero = isZero && digit == "0";
 
   if (isFull || bothZero) {
@@ -70,31 +92,33 @@ function addDigit(digit) {
   }
 
   if (isZero) {
-    currentNumber = digit;
+    inputNumber = digit;
   } else {
-    currentNumber += digit;
+    inputNumber += digit;
   }
 
-  updateDisplay(currentNumber);
+  const display = document.querySelector(".calculator__display");
+  display.textContent = inputNumber;
 }
 
 function addDecimal() {
-  const isFull = currentNumber.length == 9;
-  const hasDecimal = currentNumber.includes(".");
+  const isFull = inputNumber.length == 9;
+  const hasDecimal = inputNumber.includes(".");
   
   if (isFull || hasDecimal) {
     return;
   }
 
-  currentNumber += ".";
+  inputNumber += ".";
 
-  updateDisplay(currentNumber);
+  const display = document.querySelector(".calculator__display");
+  display.textContent = inputNumber;
 }
 
 function changeSign() {
-  const isFull = currentNumber.length == 9;
-  const isZero = currentNumber == "0";
-  const isNegative = !isZero && currentNumber.includes("-");
+  const isFull = inputNumber.length == 9;
+  const isZero = inputNumber == "0";
+  const isNegative = !isZero && inputNumber.includes("-");
   const isFullPositive = isFull && !isNegative;
   
   if (isZero || isFullPositive) {
@@ -102,17 +126,13 @@ function changeSign() {
   }
   
   if (isNegative) {
-    currentNumber = currentNumber.replace("-", "");
+    inputNumber = inputNumber.replace("-", "");
   } else {
-    currentNumber = "-" + currentNumber;
+    inputNumber = "-" + inputNumber;
   }
 
-  updateDisplay(currentNumber);
-}
-
-function updateDisplay(text) {
   const display = document.querySelector(".calculator__display");
-  display.textContent = text;
+  display.textContent = inputNumber;
 }
 
 function operate(op, num1, num2) {
