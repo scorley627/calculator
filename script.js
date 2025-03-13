@@ -44,8 +44,14 @@ function handleButtonClick(button) {
 }
 
 function handleOperator(button) {
-  if (operatorButton != null) {
+  const hasOperator = operatorButton != null;
+  const hasInput = inputNumber != "";
+  const hasSameOperator = hasOperator && operatorButton == button;
+
+  if (hasOperator && hasInput) {
     calculateResult();
+  } else if (!hasInput && !hasSameOperator) {
+    operatorButton.classList.remove("button--highlight");
   }
 
   operatorButton = button;
@@ -58,7 +64,9 @@ function handleOperator(button) {
 }
 
 function calculateResult() {
-  if (operatorButton == null) {
+  const hasOperator = operatorButton != null;
+  const hasInput = inputNumber != "";
+  if (!hasOperator || !hasInput) {
     return;
   }
 
