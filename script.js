@@ -77,17 +77,22 @@ function calculateResult() {
   operand2 = parseFloat(display.textContent);
   result = operate(operator, operand1, operand2);
 
-  const isFloat = !Number.isInteger(result);
   const isTooLong = result.toString().length > 9;
   const isPositive = result > 0;
 
-  if (isFloat && isTooLong) {
-    result = isPositive ? result.toFixed(7) : result.toFixed(6);
-  } else if (!isFloat && isTooLong) {
-    result = isPositive ? result.toExponential(3) : result.toExponential(2);
+  console.log(`${operand1} ${operator} ${operand2} = ${result}`);
+
+  if (isTooLong) {
+    result = isPositive ? result.toExponential(4) : result.toExponential(3);
+    result = result.replace("e+0", "000");
+    const expLength = result.slice(result.indexOf("e")).length - 2;
+    if (expLength > 1) {
+      const decimalLength = isPositive ? 5 - expLength : 4 - expLength;
+      result = parseFloat(result).toExponential(decimalLength);
+    }
   }
 
-  display.textContent = parseFloat(result);
+  display.textContent = result;
   inputNumber = "";
 }
 
