@@ -78,17 +78,32 @@ function calculateResult() {
   result = operate(operator, operand1, operand2);
 
   const isTooLong = result.toString().length > 9;
+  const isOutsideRange = result > 999999999 || result < -99999999;
   const isPositive = result > 0;
 
-  console.log(`${operand1} ${operator} ${operand2} = ${result}`);
+  // To get the number of digits before the decimal place in a number,
+  // calculate the log base 10 of the number and add 1.
+  const numDigits = Math.floor(Math.log(Math.abs(result)) * Math.LOG10E) + 1;
 
-  if (isTooLong) {
-    result = isPositive ? result.toExponential(4) : result.toExponential(3);
-    result = result.replace("e+0", "000");
-    const expLength = result.slice(result.indexOf("e")).length - 2;
-    if (expLength > 1) {
-      const decimalLength = isPositive ? 5 - expLength : 4 - expLength;
-      result = parseFloat(result).toExponential(decimalLength);
+  if (isTooLong && !isOutsideRange) {
+    const maxDecimals = isPositive ? 8 - numDigits : 7 - numDigits;
+    if (maxDecimals < 1) {
+      result = Math.round(result);
+    } else {
+      result = result.toFixed(maxDecimals);
+    }
+  } else if (isOutsideRange) {
+    // The exponent of a number in scientific notation is number of digits - 1
+    let exponentLength = String(numDigits - 1).length;
+    const maxDecimals = isPositive ? 5 - exponentLength : 4 - exponentLength;
+    result = result.toExponential(maxDecimals);
+
+    // We sometimes round up and add a new digit, which could cause overflow.
+    // For example multiplying 999999999 * 10
+    let newNumDigits = Math.floor(Math.log(Math.abs(result)) * Math.LOG10E) + 1;
+    let newExponentLength = String(newNumDigits - 1).length;
+    if (newExponentLength > exponentLength) {
+      result = parseFloat(result).toExponential(maxDecimals - 1);
     }
   }
 
