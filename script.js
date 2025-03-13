@@ -9,7 +9,7 @@ let operator;
 let operand1;
 let operand2;
 
-let inputNumber = "0";
+let inputNumber = "";
 let operatorButton;
 
 document.addEventListener("click", handleClick);
@@ -54,7 +54,7 @@ function handleOperator(button) {
   const display = document.querySelector(".calculator__display");
   operator = operatorButton.textContent;
   operand1 = parseFloat(display.textContent);
-  inputNumber = "0";
+  inputNumber = "";
 }
 
 function calculateResult() {
@@ -66,14 +66,14 @@ function calculateResult() {
   result = operate(operator, operand1, operand2);
 
   display.textContent = result
-  inputNumber = "0";
+  inputNumber = "";
 }
 
 function clear() {
   operator = null;
   operand1 = 0;
   operand2 = 0;
-  inputNumber = "0"
+  inputNumber = ""
   if (operatorButton != null) {
     operatorButton.classList.remove("button--highlight");
     operatorButton = null;
