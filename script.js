@@ -65,7 +65,11 @@ function calculateResult() {
   operand2 = parseFloat(display.textContent);
   result = operate(operator, operand1, operand2);
 
-  display.textContent = result
+  if (!Number.isInteger(result) && result.toString().length > 9) {
+    result = result.toFixed(7);
+  }
+
+  display.textContent = result;
   inputNumber = "";
 }
 
