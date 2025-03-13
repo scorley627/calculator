@@ -87,7 +87,7 @@ function calculateResult() {
     result = isPositive ? result.toExponential(3) : result.toExponential(2);
   }
 
-  display.textContent = result;
+  display.textContent = parseFloat(result);
   inputNumber = "";
 }
 
@@ -126,12 +126,17 @@ function addDigit(digit) {
 function addDecimal() {
   const isFull = inputNumber.length == 9;
   const hasDecimal = inputNumber.includes(".");
+  const hasInput = inputNumber != "";
   
   if (isFull || hasDecimal) {
     return;
   }
 
-  inputNumber += ".";
+  if (hasInput) {
+    inputNumber += ".";
+  } else {
+    inputNumber = "0.";
+  }
 
   const display = document.querySelector(".calculator__display");
   display.textContent = inputNumber;
