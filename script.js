@@ -85,9 +85,6 @@ function calculateResult() {
     result = isPositive ? result.toFixed(7) : result.toFixed(6);
   } else if (!isFloat && isTooLong) {
     result = result.toExponential(3);
-    // if (result.toString().length > 9) {
-    //   result = result.toFixed(5);
-    // }
   }
 
   display.textContent = result;
