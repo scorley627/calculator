@@ -77,8 +77,17 @@ function calculateResult() {
   operand2 = parseFloat(display.textContent);
   result = operate(operator, operand1, operand2);
 
-  if (!Number.isInteger(result) && result.toString().length > 9) {
-    result = result.toFixed(7);
+  const isFloat = !Number.isInteger(result);
+  const isTooLong = result.toString().length > 9;
+  const isPositive = result > 0;
+
+  if (isFloat && isTooLong) {
+    result = isPositive ? result.toFixed(7) : result.toFixed(6);
+  } else if (!isFloat && isTooLong) {
+    result = result.toExponential(3);
+    // if (result.toString().length > 9) {
+    //   result = result.toFixed(5);
+    // }
   }
 
   display.textContent = result;
