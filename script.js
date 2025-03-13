@@ -58,6 +58,10 @@ function handleOperator(button) {
 }
 
 function calculateResult() {
+  if (operatorButton == null) {
+    return;
+  }
+
   operatorButton.classList.remove("button--highlight");
   operatorButton = null;
 
