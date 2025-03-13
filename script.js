@@ -84,7 +84,7 @@ function calculateResult() {
   if (isFloat && isTooLong) {
     result = isPositive ? result.toFixed(7) : result.toFixed(6);
   } else if (!isFloat && isTooLong) {
-    result = result.toExponential(3);
+    result = isPositive ? result.toExponential(3) : result.toExponential(2);
   }
 
   display.textContent = result;
@@ -140,10 +140,11 @@ function addDecimal() {
 function changeSign() {
   const isFull = inputNumber.length == 9;
   const isZero = inputNumber == "0";
+  const hasInput = inputNumber != "";
   const isNegative = !isZero && inputNumber.includes("-");
   const isFullPositive = isFull && !isNegative;
   
-  if (isZero || isFullPositive) {
+  if (isZero || isFullPositive || !hasInput) {
     return;
   }
   
