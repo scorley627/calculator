@@ -46,11 +46,11 @@ function handleButtonClick(button) {
 function handleOperator(button) {
   const hasOperator = operatorButton != null;
   const hasInput = inputNumber != "";
-  const hasSameOperator = hasOperator && operatorButton == button;
+  const hasSameOperator = operatorButton == button;
 
   if (hasOperator && hasInput) {
     calculateResult();
-  } else if (!hasInput && !hasSameOperator) {
+  } else if (!hasInput && hasOperator && !hasSameOperator) {
     operatorButton.classList.remove("button--highlight");
   }
 
