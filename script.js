@@ -27,6 +27,7 @@ function handleButtonClick(button) {
   const isOperatorButton = button.className.includes("operator");
   const isEqualsButton = button.className.includes("equals");
   const isClearButton = button.className.includes("clear");
+  const isBackButton = button.className.includes("back");
 
   if (isNumberButton) {
     addDigit(button.textContent);
@@ -40,6 +41,8 @@ function handleButtonClick(button) {
     calculateResult();
   } else if (isClearButton) {
     clear();
+  } else if (isBackButton) {
+    removeChar();
   }
 }
 
@@ -139,6 +142,20 @@ function clear() {
   }
   const display = document.querySelector(".calculator__display");
   display.textContent = "0";
+}
+
+function removeChar() {
+  if (inputNumber == "") {
+    return;
+  }
+
+  inputNumber = inputNumber.slice(0, -1);
+  const display = document.querySelector(".calculator__display");
+  if (inputNumber == "" && operatorButton == null) {
+    display.textContent = "0";
+  } else {
+    display.textContent = inputNumber;
+  }
 }
 
 function addDigit(digit) {
