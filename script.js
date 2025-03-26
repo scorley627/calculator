@@ -4,6 +4,8 @@ const TIMES_SIGN = "\u00D7";
 const DIVIDE_SIGN = "\u00f7";
 const RANGE_TOP = 999999999;
 const RANGE_BOTTOM = -99999999;
+const NUMBER_CHARS = "1234567890";
+const OPERATOR_CHARS = "+-*/";
 
 let operator;
 let operand1;
@@ -13,10 +15,33 @@ let inputNumber = "";
 let operatorButton;
 
 document.addEventListener("click", handleClick);
+document.addEventListener("keydown", handleKeyDown);
 
 function handleClick(event) {
   if (event.target.className.includes("button")) {
     handleButtonClick(event.target);
+  }
+}
+
+function handleKeyDown(event) {
+  const isNumberKey = NUMBER_CHARS.includes(event.key);
+  const isOperatorKey = OPERATOR_CHARS.includes(event.key);
+  const isDecimalKey = event.key == ".";
+  const isEqualsKey = event.key == "Enter" || event.key == "=";
+  const isBackKey = event.key == "Backspace";
+
+  if (isNumberKey) {
+    addDigit(event.key);
+  } else if (isDecimalKey) {
+    addDecimal();
+  } else if (isOperatorKey) {
+    event.preventDefault();
+    const operatorButton = getOperatorButtonFromKey(event.key);
+    handleOperator(operatorButton);
+  } else if (isEqualsKey) {
+    calculateResult();
+  } else if (isBackKey) {
+    removeChar();
   }
 }
 
@@ -215,6 +240,15 @@ function changeSign() {
 
   const display = document.querySelector(".calculator__display");
   display.textContent = inputNumber;
+}
+
+function getOperatorButtonFromKey(key) {
+  switch (key) {
+    case "+": return document.querySelector(".button--add");
+    case "-": return document.querySelector(".button--minus");
+    case "*": return document.querySelector(".button--times");
+    case "/": return document.querySelector(".button--divide");
+  }
 }
 
 function operate(op, num1, num2) {
