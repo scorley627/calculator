@@ -115,8 +115,13 @@ function sanitizeResult(result) {
   const isOutsideRange = result < RANGE_BOTTOM || result > RANGE_TOP;
   const isPositive = result > 0;
 
-  // Number of digits before the decimal place is log base 10 + 1
-  const numDigits = Math.floor(Math.log(Math.abs(result)) * Math.LOG10E) + 1;
+  let numDigits;
+  if (Math.abs(result) > 1) {
+    // Number of digits before the decimal place is log base 10 + 1
+    numDigits = Math.floor(Math.log(Math.abs(result)) * Math.LOG10E) + 1;
+  } else {
+    numDigits = 1;
+  }
 
   if (isTooLong && !isOutsideRange) {
     let numDecimals;
