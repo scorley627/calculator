@@ -123,8 +123,6 @@ function sanitizeResult(result) {
     numDigits = 1;
   }
 
-  console.log(numDigits);
-
   if (isTooLong && !isOutsideRange) {
     let numDecimals;
     if (isPositive) {
