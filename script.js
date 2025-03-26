@@ -1,9 +1,9 @@
-const NUMBER_CHARS = "1234567890";
 const PLUS_SIGN = "+";
 const MINUS_SIGN = "\u2212";
 const TIMES_SIGN = "\u00D7";
 const DIVIDE_SIGN = "\u00f7";
-const OPERATOR_CHARS = PLUS_SIGN + MINUS_SIGN + TIMES_SIGN + DIVIDE_SIGN;
+const RANGE_TOP = 999999999;
+const RANGE_BOTTOM = -99999999;
 
 let operator;
 let operand1;
@@ -21,12 +21,12 @@ function handleClick(event) {
 }
 
 function handleButtonClick(button) {
-  const isNumberButton = NUMBER_CHARS.includes(button.textContent);
-  const isOperatorButton = OPERATOR_CHARS.includes(button.textContent);
+  const isNumberButton = button.className.includes("number");
+  const isDecimalButton = button.className.includes("decimal");
   const isSignButton = button.className.includes("sign");
+  const isOperatorButton = button.className.includes("operator");
   const isEqualsButton = button.className.includes("equals");
-  const isDecimalButton = button.textContent == ".";
-  const isClearButton = button.textContent == "C";
+  const isClearButton = button.className.includes("clear");
 
   if (isNumberButton) {
     addDigit(button.textContent);
@@ -49,8 +49,10 @@ function handleOperator(button) {
   const hasSameOperator = operatorButton == button;
 
   if (hasOperator && hasInput) {
+    // Calculate current result to be used as new operand1
     calculateResult();
   } else if (!hasInput && hasOperator && !hasSameOperator) {
+    // Changing operator button; remove current highlight
     operatorButton.classList.remove("button--highlight");
   }
 
@@ -58,8 +60,8 @@ function handleOperator(button) {
   operatorButton.classList.add("button--highlight");
 
   const display = document.querySelector(".calculator__display");
-  operator = operatorButton.textContent;
   operand1 = parseFloat(display.textContent);
+  operator = operatorButton.textContent;
   inputNumber = "";
 }
 
@@ -70,45 +72,60 @@ function calculateResult() {
     return;
   }
 
-  operatorButton.classList.remove("button--highlight");
-  operatorButton = null;
-
   const display = document.querySelector(".calculator__display");
   operand2 = parseFloat(display.textContent);
   result = operate(operator, operand1, operand2);
+  display.textContent = sanitizeResult(result);
 
+  operatorButton.classList.remove("button--highlight");
+  operatorButton = null;
+  inputNumber = "";
+}
+
+function sanitizeResult(result) {
   const isTooLong = result.toString().length > 9;
-  const isOutsideRange = result > 999999999 || result < -99999999;
+  const isOutsideRange = result < RANGE_BOTTOM || result > RANGE_TOP;
   const isPositive = result > 0;
 
-  // To get the number of digits before the decimal place in a number,
-  // calculate the log base 10 of the number and add 1.
+  // Number of digits before the decimal place is log base 10 + 1
   const numDigits = Math.floor(Math.log(Math.abs(result)) * Math.LOG10E) + 1;
 
   if (isTooLong && !isOutsideRange) {
-    const maxDecimals = isPositive ? 8 - numDigits : 7 - numDigits;
-    if (maxDecimals < 1) {
+    let numDecimals;
+    if (isPositive) {
+      numDecimals = 8 - numDigits;
+    } else {
+      numDecimals = 7 - numDigits;
+    }
+
+    if (numDecimals < 1) {
       result = Math.round(result);
     } else {
-      result = result.toFixed(maxDecimals);
+      result = result.toFixed(numDecimals);
     }
   } else if (isOutsideRange) {
-    // The exponent of a number in scientific notation is number of digits - 1
-    let exponentLength = String(numDigits - 1).length;
-    const maxDecimals = isPositive ? 5 - exponentLength : 4 - exponentLength;
-    result = result.toExponential(maxDecimals);
+    // The exponent in scientific notation is number of digits - 1
+    const exponentLength = String(numDigits - 1).length;
 
-    // We sometimes round up and add a new digit, which could cause overflow.
-    // For example multiplying 999999999 * 10
-    let newNumDigits = Math.floor(Math.log(Math.abs(result)) * Math.LOG10E) + 1;
-    let newExponentLength = String(newNumDigits - 1).length;
-    if (newExponentLength > exponentLength) {
-      result = parseFloat(result).toExponential(maxDecimals - 1);
+    let numDecimals;
+    if (isPositive) {
+      numDecimals = 5 - exponentLength;
+    } else {
+      numDecimals = 4 - exponentLength;
+    }
+
+    result = result.toExponential(numDecimals);
+
+    // We sometimes round up and add a new digit, which could cause overflow
+    // E.g. 999999999 * 10 = 9999999990 rounds to 10000000000 as 1.0000e+10
+    const newNumDigits =
+      Math.floor(Math.log(Math.abs(result)) * Math.LOG10E) + 1;
+    if (newNumDigits > numDigits) {
+      result = parseFloat(result).toExponential(numDecimals - 1);
     }
   }
 
-  display.textContent = result;
-  inputNumber = "";
+  return result;
 }
 
 function clear() {
